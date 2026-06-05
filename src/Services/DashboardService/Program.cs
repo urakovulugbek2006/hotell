@@ -23,10 +23,10 @@ builder.Services.AddSignalR();
 builder.Services.AddHotelOSInfrastructure(builder.Configuration);
 
 // Add Dashboard Service
-builder.Services.AddScoped<IDashboardService, DashboardService.Services.DashboardService>();
+builder.Services.AddScoped<IDashboardService, global::DashboardService.Services.DashboardService>();
 
 // Add Broker Event Handler (bridges Redis Pub/Sub -> SignalR)
-builder.Services.AddSingleton<DashboardService.EventHandlers.BrokerEventHandler>();
+builder.Services.AddSingleton<global::DashboardService.EventHandlers.BrokerEventHandler>();
 
 // Add CORS for SignalR
 builder.Services.AddCors(options =>
@@ -83,7 +83,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Subscribe the dashboard to all broker events so updates flow to clients in real time
-var brokerEventHandler = app.Services.GetRequiredService<DashboardService.EventHandlers.BrokerEventHandler>();
+var brokerEventHandler = app.Services.GetRequiredService<global::DashboardService.EventHandlers.BrokerEventHandler>();
 await brokerEventHandler.SubscribeToAllEventsAsync();
 
 app.Run();

@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHotelOSInfrastructure(builder.Configuration);
 
 // Add Housekeeping Service dependencies
-builder.Services.AddScoped<IHousekeepingService, HousekeepingService.Services.HousekeepingService>();
+builder.Services.AddScoped<IHousekeepingService, global::HousekeepingService.Services.HousekeepingService>();
 
 // Add Event Handlers
 builder.Services.AddScoped<IEventHandler<RoomVacatedEvent>, ReceptionEventHandler>();

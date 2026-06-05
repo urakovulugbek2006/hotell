@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHotelOSInfrastructure(builder.Configuration);
 
 // Register an HttpClient so the Frontend Service can call the other microservices
-builder.Services.AddHttpClient<IFrontendService, FrontendService.Services.FrontendService>();
+builder.Services.AddHttpClient<IFrontendService, global::FrontendService.Services.FrontendService>();
 
 // Add CORS so the React guest-portal can call this API
 builder.Services.AddCors(options =>

@@ -1,5 +1,5 @@
+using HotelOS.Shared.Events;
 using HotelOS.Shared.Models;
-using HousekeepingService.DTOs;
 using System.ComponentModel.DataAnnotations;
 
 namespace HousekeepingService.Models;
