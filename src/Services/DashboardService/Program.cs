@@ -64,15 +64,9 @@ app.MapHub<DashboardHub>("/dashboardHub");
 
 app.MapControllers();
 
-// Ensure database is created
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
-    await context.Database.EnsureCreatedAsync();
-    
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("HotelOS Dashboard Service starting up");
-}
+// Ensure database is created (with retry - all services share one SQLite file)
+app.Logger.LogInformation("HotelOS Dashboard Service starting up");
+await app.Services.InitialiseDatabaseAsync(app.Logger);
 
 // Subscribe the dashboard to all broker events so updates flow to clients in real time.
 // Wrapped so a transient Redis hiccup can never stop the API from serving requests.

@@ -54,18 +54,8 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 
-// Ensure database is created
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
-    await context.Database.EnsureCreatedAsync();
-    
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("HotelOS Room Service starting up");
-    logger.LogInformation("Database connection: {ConnectionString}", 
-        builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=HotelOS.db");
-    logger.LogInformation("Redis connection: {ConnectionString}", 
-        builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379");
-}
+// Ensure database is created (with retry - all services share one SQLite file)
+app.Logger.LogInformation("HotelOS Room Service starting up");
+await app.Services.InitialiseDatabaseAsync(app.Logger);
 
 app.Run();

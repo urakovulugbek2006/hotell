@@ -54,14 +54,12 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 
-// Ensure database is created
+// Ensure database is created (with retry - all services share one SQLite file)
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
-    await context.Database.EnsureCreatedAsync();
-
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     logger.LogInformation("HotelOS Frontend (Guest Portal) Service starting up");
 }
+await app.Services.InitialiseDatabaseAsync(app.Logger);
 
 app.Run();

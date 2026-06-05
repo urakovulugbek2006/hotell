@@ -23,6 +23,7 @@ services:
       context: .
       dockerfile: src/Services/ReceptionService/Dockerfile
     container_name: hotelos-reception
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
@@ -45,6 +46,7 @@ services:
       context: .
       dockerfile: src/Services/HousekeepingService/Dockerfile
     container_name: hotelos-housekeeping
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
@@ -67,6 +69,7 @@ services:
       context: .
       dockerfile: src/Services/RoomService/Dockerfile
     container_name: hotelos-roomservice
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
@@ -89,6 +92,7 @@ services:
       context: .
       dockerfile: src/Services/MaintenanceService/Dockerfile
     container_name: hotelos-maintenance
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
@@ -111,6 +115,7 @@ services:
       context: .
       dockerfile: src/Services/DashboardService/Dockerfile
     container_name: hotelos-dashboard
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
@@ -133,6 +138,7 @@ services:
       context: .
       dockerfile: src/Services/FrontendService/Dockerfile
     container_name: hotelos-frontend-api
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db

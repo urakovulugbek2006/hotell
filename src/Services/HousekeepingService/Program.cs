@@ -59,31 +59,23 @@ app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 
-// Set up event subscriptions
-using (var scope = app.Services.CreateScope())
+// Set up event subscriptions (guarded so a Redis hiccup can't crash startup)
+try
 {
+    using var scope = app.Services.CreateScope();
     var messageBroker = scope.ServiceProvider.GetRequiredService<IMessageBroker>();
     var receptionEventHandler = scope.ServiceProvider.GetRequiredService<IEventHandler<RoomVacatedEvent>>();
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-    // Subscribe to room vacated events from reception service
     await messageBroker.SubscribeAsync<RoomVacatedEvent>(EventTopics.RoomVacated, receptionEventHandler.HandleAsync);
-    
-    logger.LogInformation("Subscribed to reception events: {Topic}", EventTopics.RoomVacated);
+    app.Logger.LogInformation("Subscribed to reception events: {Topic}", EventTopics.RoomVacated);
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Failed to subscribe to RoomVacated events at startup - the API will still serve requests");
 }
 
-// Ensure database is created
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
-    await context.Database.EnsureCreatedAsync();
-    
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("HotelOS Housekeeping Service starting up");
-    logger.LogInformation("Database connection: {ConnectionString}", 
-        builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=HotelOS.db");
-    logger.LogInformation("Redis connection: {ConnectionString}", 
-        builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379");
-}
+// Ensure database is created (with retry - all services share one SQLite file)
+app.Logger.LogInformation("HotelOS Housekeeping Service starting up");
+await app.Services.InitialiseDatabaseAsync(app.Logger);
 
 app.Run();
