@@ -427,3 +427,12 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+
+# HotelOS — SQLite databases (generated at runtime)
+*.db
+*.db-shm
+*.db-wal
+
+# HotelOS — frontend build output
+dist/
