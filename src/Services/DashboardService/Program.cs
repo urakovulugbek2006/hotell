@@ -57,7 +57,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseRouting();
 app.UseAuthorization();

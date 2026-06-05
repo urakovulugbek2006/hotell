@@ -9,6 +9,24 @@ export default function LoginPage() {
     firstName: '', lastName: '', email: '', phoneNumber: '', dateOfBirth: '2000-01-01'
   });
 
+  // Pull the most useful message out of an axios error so the user sees the
+  // real reason (validation error, server message, or a network problem).
+  const extractError = (err, fallback) => {
+    if (err?.response) {
+      const data = err.response.data;
+      if (typeof data === 'string') return data;
+      if (data?.errorMessage) return data.errorMessage;
+      if (data?.error) return data.error;
+      if (data?.errors) {
+        const first = Object.values(data.errors)[0];
+        return Array.isArray(first) ? first[0] : String(first);
+      }
+      return `Server returned ${err.response.status}.`;
+    }
+    // No response = network/CORS problem (API not reachable on :5006)
+    return `${fallback} Could not reach the API at :5006 - check the frontend-service container is running.`;
+  };
+
   const doLogin = async (e) => {
     e.preventDefault();
     setMessage(null);
@@ -21,8 +39,8 @@ export default function LoginPage() {
       } else {
         setMessage({ type: 'error', text: res.data?.errorMessage || 'Login failed.' });
       }
-    } catch {
-      setMessage({ type: 'error', text: 'Login request failed.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: extractError(err, 'Login request failed.') });
     }
   };
 
@@ -38,8 +56,8 @@ export default function LoginPage() {
       } else {
         setMessage({ type: 'error', text: res.data?.errorMessage || 'Registration failed.' });
       }
-    } catch {
-      setMessage({ type: 'error', text: 'Registration request failed.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: extractError(err, 'Registration request failed.') });
     }
   };
 
