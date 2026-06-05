@@ -1,0 +1,103 @@
+:root {
+  --primary: #1f4e79;
+  --bg: #0f1722;
+  --panel: #182332;
+  --panel-2: #1f2d3f;
+  --text: #e6edf5;
+  --muted: #8da2b8;
+  --accent: #c8a45c;
+  --border: #243447;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); }
+
+/* ---- Login gate ---- */
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 30% 20%, #1c2e44, #0f1722); }
+.login-card { background: var(--panel); padding: 2.5rem; border-radius: 14px; width: 360px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); border: 1px solid var(--border); }
+.login-logo { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem; }
+.login-card h2 { margin-bottom: 0.4rem; }
+.login-card input { width: 100%; padding: 0.7rem; margin: 1rem 0; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); }
+.hint { margin-top: 1rem; text-align: center; font-size: 0.8rem; }
+.hint code { background: var(--panel-2); padding: 0.1rem 0.4rem; border-radius: 4px; }
+
+.btn-primary { background: var(--accent); color: #1c1c1c; border: none; padding: 0.7rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-block { width: 100%; }
+.muted { color: var(--muted); }
+.alert { padding: 0.6rem 0.9rem; border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.alert-error { background: #3a1f1f; color: #f0a8a4; }
+.alert-success { background: #1e3a2a; color: #9fe0bb; }
+
+/* ---- Dashboard shell ---- */
+.dash-header { display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+.dash-brand { font-weight: 800; font-size: 1.15rem; }
+.dash-brand span { color: var(--muted); font-weight: 400; font-size: 0.9rem; margin-left: 0.4rem; }
+.dash-header-right { display: flex; align-items: center; gap: 1rem; }
+.conn-pill { color: #fff; padding: 0.25rem 0.7rem; border-radius: 999px; font-size: 0.8rem; text-transform: capitalize; }
+.btn-logout { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 0.4rem 0.9rem; border-radius: 8px; cursor: pointer; }
+.btn-logout:hover { color: var(--text); }
+
+.dash-main { padding: 1.5rem; max-width: 1500px; margin: 0 auto; }
+
+/* ---- Overview cards ---- */
+.overview-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.ov-card { background: var(--panel); border-radius: 12px; padding: 1.1rem 1.25rem; display: flex; align-items: center; gap: 0.9rem; border-left: 4px solid var(--accent); }
+.ov-icon { font-size: 1.6rem; }
+.ov-value { font-size: 1.5rem; font-weight: 700; }
+.ov-label { color: var(--muted); font-size: 0.8rem; }
+
+/* ---- Grid layout ---- */
+.dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 1.25rem; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 1.25rem; }
+@media (max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; } .two-col { grid-template-columns: 1fr; } }
+
+.panel { background: var(--panel); border-radius: 12px; padding: 1.25rem; border: 1px solid var(--border); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.panel-head h3 { font-size: 1rem; }
+
+/* ---- Room tiles ---- */
+.room-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.75rem; }
+.room-tile { border-radius: 10px; padding: 0.8rem; text-align: center; background: var(--panel-2); border: 1px solid var(--border); }
+.rt-number { font-size: 1.2rem; font-weight: 700; }
+.rt-status { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 0.2rem; }
+.rt-guest { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
+.st-available { border-left: 4px solid #2e7d52; }
+.st-occupied { border-left: 4px solid #1f6feb; }
+.st-dirty { border-left: 4px solid #d98324; }
+.st-cleaning { border-left: 4px solid #3fb6c8; }
+.st-clean { border-left: 4px solid #2e7d52; }
+.st-maint { border-left: 4px solid #b3403a; }
+.st-ooo { border-left: 4px solid #6b7a8d; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; font-size: 0.75rem; color: var(--muted); }
+.legend-item { display: flex; align-items: center; gap: 0.3rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* ---- Tables ---- */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.data-table th { text-align: left; color: var(--muted); font-weight: 500; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); }
+.data-table td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
+.issue-cell { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badge { padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; background: var(--panel-2); }
+.badge-success { background: #1e3a2a; color: #9fe0bb; }
+.badge-warning { background: #3a2f1a; color: #e6c98a; }
+.badge-danger { background: #3a1f1f; color: #f0a8a4; }
+.badge-primary { background: #1a2b45; color: #a8c5f0; }
+.badge-info { background: #16323a; color: #9fd6e0; }
+
+/* ---- Live feed ---- */
+.feed-panel { max-height: 640px; display: flex; flex-direction: column; }
+.feed-list { overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+.feed-item { display: flex; gap: 0.6rem; padding: 0.55rem; border-radius: 8px; background: var(--panel-2); }
+.feed-icon { font-size: 1rem; }
+.feed-text { font-size: 0.85rem; }
+.feed-time { font-size: 0.7rem; color: var(--muted); margin-top: 0.15rem; }
+.feed-error { border-left: 3px solid #b3403a; }
+.feed-success { border-left: 3px solid #2e7d52; }
+.feed-room { border-left: 3px solid #d98324; }
+.feed-order { border-left: 3px solid #3fb6c8; }
+.feed-maint { border-left: 3px solid #b3403a; }
+.feed-checkin { border-left: 3px solid #1f6feb; }
+
+.pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: #2e7d52; display: inline-block; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46,125,82,0.6); } 70% { box-shadow: 0 0 0 8px rgba(46,125,82,0); } 100% { box-shadow: 0 0 0 0 rgba(46,125,82,0); } }
