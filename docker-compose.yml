@@ -26,6 +26,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_EnableWriteXorExecute=0
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
       - ConnectionStrings__Redis=redis:6379
     ports:
@@ -49,6 +50,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_EnableWriteXorExecute=0
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
       - ConnectionStrings__Redis=redis:6379
     ports:
@@ -72,6 +74,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_EnableWriteXorExecute=0
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
       - ConnectionStrings__Redis=redis:6379
     ports:
@@ -95,6 +98,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_EnableWriteXorExecute=0
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
       - ConnectionStrings__Redis=redis:6379
     ports:
@@ -118,6 +122,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_EnableWriteXorExecute=0
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
       - ConnectionStrings__Redis=redis:6379
     ports:
@@ -141,6 +146,7 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_EnableWriteXorExecute=0
       - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
       - ConnectionStrings__Redis=redis:6379
       - ServiceUrls__ReceptionService=http://reception-service:5001
