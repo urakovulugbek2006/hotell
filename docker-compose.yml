@@ -1,0 +1,190 @@
+services:
+  # ---------------------------------------------------------------------------
+  # Message Broker - Redis Pub/Sub
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: hotelos-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Reception Service - check-in/out, room assignment, billing
+  # ---------------------------------------------------------------------------
+  reception-service:
+    build:
+      context: .
+      dockerfile: src/Services/ReceptionService/Dockerfile
+    container_name: hotelos-reception
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
+      - ConnectionStrings__Redis=redis:6379
+    ports:
+      - "5001:5001"
+    volumes:
+      - hotelos-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Housekeeping Service - room cleaning + status management
+  # ---------------------------------------------------------------------------
+  housekeeping-service:
+    build:
+      context: .
+      dockerfile: src/Services/HousekeepingService/Dockerfile
+    container_name: hotelos-housekeeping
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
+      - ConnectionStrings__Redis=redis:6379
+    ports:
+      - "5002:5002"
+    volumes:
+      - hotelos-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Room Service - food & beverage orders
+  # ---------------------------------------------------------------------------
+  room-service:
+    build:
+      context: .
+      dockerfile: src/Services/RoomService/Dockerfile
+    container_name: hotelos-roomservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
+      - ConnectionStrings__Redis=redis:6379
+    ports:
+      - "5003:5003"
+    volumes:
+      - hotelos-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Maintenance Service - priority queue + technician dispatch
+  # ---------------------------------------------------------------------------
+  maintenance-service:
+    build:
+      context: .
+      dockerfile: src/Services/MaintenanceService/Dockerfile
+    container_name: hotelos-maintenance
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
+      - ConnectionStrings__Redis=redis:6379
+    ports:
+      - "5004:5004"
+    volumes:
+      - hotelos-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Dashboard Service - real-time operations dashboard (SignalR + Redis sub)
+  # ---------------------------------------------------------------------------
+  dashboard-service:
+    build:
+      context: .
+      dockerfile: src/Services/DashboardService/Dockerfile
+    container_name: hotelos-dashboard
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
+      - ConnectionStrings__Redis=redis:6379
+    ports:
+      - "5005:5005"
+    volumes:
+      - hotelos-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Frontend Service - guest portal API gateway
+  # ---------------------------------------------------------------------------
+  frontend-service:
+    build:
+      context: .
+      dockerfile: src/Services/FrontendService/Dockerfile
+    container_name: hotelos-frontend-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/data/HotelOS.db
+      - ConnectionStrings__Redis=redis:6379
+      - ServiceUrls__ReceptionService=http://reception-service:5001
+      - ServiceUrls__HousekeepingService=http://housekeeping-service:5002
+      - ServiceUrls__RoomService=http://room-service:5003
+      - ServiceUrls__MaintenanceService=http://maintenance-service:5004
+      - ServiceUrls__DashboardService=http://dashboard-service:5005
+    ports:
+      - "5006:5006"
+    volumes:
+      - hotelos-data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Guest Portal - React SPA (customer-facing)
+  # ---------------------------------------------------------------------------
+  guest-portal:
+    build:
+      context: ./src/Frontend/guest-portal
+      dockerfile: Dockerfile
+    container_name: hotelos-guest-portal
+    ports:
+      - "3000:80"
+    depends_on:
+      - frontend-service
+    networks:
+      - hotelos-net
+
+  # ---------------------------------------------------------------------------
+  # Staff Dashboard - React SPA (staff/management-facing)
+  # ---------------------------------------------------------------------------
+  staff-dashboard:
+    build:
+      context: ./src/Frontend/staff-dashboard
+      dockerfile: Dockerfile
+    container_name: hotelos-staff-dashboard
+    ports:
+      - "3001:80"
+    depends_on:
+      - dashboard-service
+    networks:
+      - hotelos-net
+
+volumes:
+  hotelos-data:
+
+networks:
+  hotelos-net:
+    driver: bridge
