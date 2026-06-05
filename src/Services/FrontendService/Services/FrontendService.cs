@@ -43,6 +43,7 @@ public class FrontendService : IFrontendService
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 Email = request.Email,
+                PasswordHash = HashPassword(request.Password),
                 PhoneNumber = request.PhoneNumber,
                 Address = request.Address,
                 DateOfBirth = request.DateOfBirth,
@@ -896,8 +897,15 @@ public class FrontendService : IFrontendService
                 };
             }
 
-            // Note: In a real implementation, you would verify the password hash
-            // For this demo, we'll assume the password is valid if the guest exists
+            // Verify the password against the stored hash.
+            if (string.IsNullOrEmpty(guest.PasswordHash) || guest.PasswordHash != HashPassword(request.Password))
+            {
+                return new LoginResponse
+                {
+                    IsSuccess = false,
+                    ErrorMessage = "Invalid email or password"
+                };
+            }
             
             var token = GenerateJwtToken(guest);
             var guestDTO = MapToGuestDTO(guest);
@@ -1097,6 +1105,14 @@ public class FrontendService : IFrontendService
         // Note: In a real implementation, use proper JWT token generation with signing key
         // This is a simplified version for demo purposes
         return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{guest.Id}:{guest.Email}:{DateTime.UtcNow.Ticks}"));
+    }
+
+    // Hashes a password with SHA-256. Plain-text passwords are never stored.
+    private static string HashPassword(string password)
+    {
+        using var sha = System.Security.Cryptography.SHA256.Create();
+        var bytes = sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        return Convert.ToBase64String(bytes);
     }
 
     private static string GetRoomTypeDescription(RoomType type) => type switch

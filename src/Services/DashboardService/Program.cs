@@ -47,15 +47,13 @@ builder.Logging.AddDebug();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Swagger is enabled in all environments so the API is browsable in Docker.
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelOS Dashboard Service v1");
-        c.RoutePrefix = string.Empty; // Swagger UI at root
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelOS Dashboard Service v1");
+    c.RoutePrefix = string.Empty; // Swagger UI at root
+});
 
 app.UseCors("AllowAll");
 app.UseRouting();
@@ -74,15 +72,18 @@ using (var scope = app.Services.CreateScope())
     
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     logger.LogInformation("HotelOS Dashboard Service starting up");
-    logger.LogInformation("Database connection: {ConnectionString}", 
-        builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=HotelOS.db");
-    logger.LogInformation("Redis connection: {ConnectionString}", 
-        builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379");
-    logger.LogInformation("SignalR Hub available at: /dashboardHub");
 }
 
-// Subscribe the dashboard to all broker events so updates flow to clients in real time
-var brokerEventHandler = app.Services.GetRequiredService<global::DashboardService.EventHandlers.BrokerEventHandler>();
-await brokerEventHandler.SubscribeToAllEventsAsync();
+// Subscribe the dashboard to all broker events so updates flow to clients in real time.
+// Wrapped so a transient Redis hiccup can never stop the API from serving requests.
+try
+{
+    var brokerEventHandler = app.Services.GetRequiredService<global::DashboardService.EventHandlers.BrokerEventHandler>();
+    await brokerEventHandler.SubscribeToAllEventsAsync();
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Failed to subscribe to broker events at startup - dashboard REST API will still serve data");
+}
 
 app.Run();

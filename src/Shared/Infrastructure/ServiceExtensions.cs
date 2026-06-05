@@ -14,11 +14,18 @@ public static class ServiceExtensions
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection") ?? 
                              "Data Source=HotelOS.db"));
 
-        // Add Redis Connection
+        // Add Redis Connection.
+        // AbortOnConnectFail = false is critical in Docker: it lets the service
+        // start even if Redis isn't ready yet, then reconnect automatically,
+        // instead of throwing and crashing the whole service on startup.
         services.AddSingleton<IConnectionMultiplexer>(provider =>
         {
             var connectionString = configuration.GetConnectionString("Redis") ?? "localhost:6379";
-            return ConnectionMultiplexer.Connect(connectionString);
+            var options = ConfigurationOptions.Parse(connectionString);
+            options.AbortOnConnectFail = false;
+            options.ConnectRetry = 5;
+            options.ConnectTimeout = 10000;
+            return ConnectionMultiplexer.Connect(options);
         });
 
         // Add Message Broker

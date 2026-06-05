@@ -18,6 +18,9 @@ public class Guest
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
     
+    // Hashed password (SHA-256). Never store plain-text passwords.
+    public string? PasswordHash { get; set; }
+    
     [Phone]
     public string? PhoneNumber { get; set; }
     

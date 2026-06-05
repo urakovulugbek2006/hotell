@@ -133,17 +133,19 @@ public class HotelDbContext : DbContext
 
     private static void SeedData(ModelBuilder modelBuilder)
     {
-        // Seed Rooms (10 rooms across 2 floors as per requirements)
+        // Seed Rooms (10 rooms across 2 floors as per requirements).
+        // A few rooms start in non-Available states so the dashboard shows
+        // realistic activity immediately on first load.
         var rooms = new[]
         {
-            new Room { Id = 1, RoomNumber = "101", Floor = 1, Type = RoomType.Single, Status = RoomStatus.Available, NightlyRate = 120.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
-            new Room { Id = 2, RoomNumber = "102", Floor = 1, Type = RoomType.Double, Status = RoomStatus.Available, NightlyRate = 180.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
-            new Room { Id = 3, RoomNumber = "103", Floor = 1, Type = RoomType.Suite, Status = RoomStatus.Available, NightlyRate = 350.00m, IsAccessible = false, NearElevator = false, NearStairs = true },
+            new Room { Id = 1, RoomNumber = "101", Floor = 1, Type = RoomType.Single, Status = RoomStatus.Clean, NightlyRate = 120.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
+            new Room { Id = 2, RoomNumber = "102", Floor = 1, Type = RoomType.Double, Status = RoomStatus.Occupied, NightlyRate = 180.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
+            new Room { Id = 3, RoomNumber = "103", Floor = 1, Type = RoomType.Suite, Status = RoomStatus.Dirty, NightlyRate = 350.00m, IsAccessible = false, NearElevator = false, NearStairs = true },
             new Room { Id = 4, RoomNumber = "104", Floor = 1, Type = RoomType.Accessible, Status = RoomStatus.Available, NightlyRate = 200.00m, IsAccessible = true, NearElevator = true, NearStairs = false },
             new Room { Id = 5, RoomNumber = "105", Floor = 1, Type = RoomType.Double, Status = RoomStatus.Available, NightlyRate = 180.00m, IsAccessible = false, NearElevator = false, NearStairs = true },
-            new Room { Id = 6, RoomNumber = "201", Floor = 2, Type = RoomType.Single, Status = RoomStatus.Available, NightlyRate = 130.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
-            new Room { Id = 7, RoomNumber = "202", Floor = 2, Type = RoomType.Double, Status = RoomStatus.Available, NightlyRate = 190.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
-            new Room { Id = 8, RoomNumber = "203", Floor = 2, Type = RoomType.Suite, Status = RoomStatus.Available, NightlyRate = 380.00m, IsAccessible = false, NearElevator = false, NearStairs = true },
+            new Room { Id = 6, RoomNumber = "201", Floor = 2, Type = RoomType.Single, Status = RoomStatus.Clean, NightlyRate = 130.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
+            new Room { Id = 7, RoomNumber = "202", Floor = 2, Type = RoomType.Double, Status = RoomStatus.Occupied, NightlyRate = 190.00m, IsAccessible = false, NearElevator = true, NearStairs = false },
+            new Room { Id = 8, RoomNumber = "203", Floor = 2, Type = RoomType.Suite, Status = RoomStatus.Maintenance, NightlyRate = 380.00m, IsAccessible = false, NearElevator = false, NearStairs = true },
             new Room { Id = 9, RoomNumber = "204", Floor = 2, Type = RoomType.Double, Status = RoomStatus.Available, NightlyRate = 190.00m, IsAccessible = false, NearElevator = false, NearStairs = true },
             new Room { Id = 10, RoomNumber = "205", Floor = 2, Type = RoomType.Accessible, Status = RoomStatus.Available, NightlyRate = 220.00m, IsAccessible = true, NearElevator = true, NearStairs = false }
         };
@@ -161,5 +163,44 @@ public class HotelDbContext : DbContext
         };
 
         modelBuilder.Entity<Staff>().HasData(staff);
+
+        // Seed demo guests (password hash is SHA-256 of "password123").
+        // This gives the dashboard real occupants and lets you log in immediately
+        // with email "guest@demo.com" / password "password123".
+        const string demoHash = "75K3eLr+dx6JJFuJ7LwIpEpOFmwGZZkRiB84PURz6U8="; // SHA-256("password123")
+        var seedDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var checkInDate = new DateTime(2026, 6, 4, 14, 0, 0, DateTimeKind.Utc);
+        var checkOutDate = new DateTime(2026, 6, 8, 11, 0, 0, DateTimeKind.Utc);
+
+        var guests = new[]
+        {
+            new Guest { Id = 1, FirstName = "Demo", LastName = "Guest", Email = "guest@demo.com", PasswordHash = demoHash, PhoneNumber = "+1234567890", DateOfBirth = new DateTime(1990, 5, 15), Nationality = "British", CreatedAt = seedDate },
+            new Guest { Id = 2, FirstName = "Sarah", LastName = "Johnson", Email = "sarah.j@demo.com", PasswordHash = demoHash, PhoneNumber = "+1234567891", DateOfBirth = new DateTime(1985, 8, 22), Nationality = "American", CreatedAt = seedDate }
+        };
+        modelBuilder.Entity<Guest>().HasData(guests);
+
+        // Two active (checked-in) bookings occupying rooms 102 and 202.
+        var bookings = new[]
+        {
+            new Booking { Id = 1, GuestId = 1, RoomId = 2, CheckInDate = checkInDate, CheckOutDate = checkOutDate, ActualCheckIn = checkInDate, Status = BookingStatus.CheckedIn, RequestedRoomType = RoomType.Double, TotalAmount = 720.00m, PaidAmount = 0m, CreatedAt = seedDate, UpdatedAt = checkInDate },
+            new Booking { Id = 2, GuestId = 2, RoomId = 7, CheckInDate = checkInDate, CheckOutDate = checkOutDate, ActualCheckIn = checkInDate, Status = BookingStatus.CheckedIn, RequestedRoomType = RoomType.Double, TotalAmount = 760.00m, PaidAmount = 0m, CreatedAt = seedDate, UpdatedAt = checkInDate }
+        };
+        modelBuilder.Entity<Booking>().HasData(bookings);
+
+        // An in-progress room service order for room 102.
+        var orderTime = new DateTime(2026, 6, 5, 12, 30, 0, DateTimeKind.Utc);
+        modelBuilder.Entity<RoomServiceOrder>().HasData(
+            new RoomServiceOrder { Id = 1, RoomId = 2, BookingId = 1, GuestName = "Demo Guest", Status = OrderStatus.Preparing, OrderTime = orderTime, TotalAmount = 13.00m, AssignedStaffId = 4 }
+        );
+        modelBuilder.Entity<OrderItem>().HasData(
+            new OrderItem { Id = 1, OrderId = 1, ItemName = "Coffee", Quantity = 2, UnitPrice = 4.50m },
+            new OrderItem { Id = 2, OrderId = 1, ItemName = "Caesar Salad", Quantity = 1, UnitPrice = 4.00m }
+        );
+
+        // An open critical maintenance request for room 203 (which is in Maintenance status).
+        var reportedTime = new DateTime(2026, 6, 5, 9, 0, 0, DateTimeKind.Utc);
+        modelBuilder.Entity<MaintenanceRequest>().HasData(
+            new MaintenanceRequest { Id = 1, RoomId = 8, Description = "Air conditioning not working - room too hot", Priority = MaintenancePriority.High, Status = MaintenanceStatus.Reported, ReportedAt = reportedTime, ReportedBy = "Front Desk" }
+        );
     }
 }

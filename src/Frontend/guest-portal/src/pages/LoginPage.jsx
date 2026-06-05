@@ -6,7 +6,7 @@ export default function LoginPage() {
   const [message, setMessage] = useState(null);
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
-    firstName: '', lastName: '', email: '', phoneNumber: '', dateOfBirth: '2000-01-01'
+    firstName: '', lastName: '', email: '', password: '', phoneNumber: '', dateOfBirth: '2000-01-01'
   });
 
   // Pull the most useful message out of an axios error so the user sees the
@@ -101,6 +101,11 @@ export default function LoginPage() {
             <label>Email</label>
             <input type="email" value={registerForm.email}
               onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })} />
+          </div>
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <label>Password (min 6 characters)</label>
+            <input type="password" value={registerForm.password}
+              onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })} />
           </div>
           <div className="form-row">
             <div className="form-group">

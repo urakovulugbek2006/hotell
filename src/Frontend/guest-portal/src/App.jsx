@@ -1,4 +1,5 @@
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import HomePage from './pages/HomePage.jsx';
 import RoomsPage from './pages/RoomsPage.jsx';
 import RoomServicePage from './pages/RoomServicePage.jsx';
@@ -7,7 +8,24 @@ import LoginPage from './pages/LoginPage.jsx';
 
 function NavBar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isActive = (path) => (location.pathname === path ? 'nav-link active' : 'nav-link');
+
+  // Track login state from localStorage so the nav reflects whether a guest is signed in.
+  const [loggedIn, setLoggedIn] = useState(() => !!localStorage.getItem('guest_id'));
+
+  // Re-check whenever the route changes (e.g. after logging in on the Sign In page).
+  useEffect(() => {
+    setLoggedIn(!!localStorage.getItem('guest_id'));
+  }, [location]);
+
+  const signOut = (e) => {
+    e.preventDefault();
+    localStorage.removeItem('guest_id');
+    localStorage.removeItem('guest_token');
+    setLoggedIn(false);
+    navigate('/');
+  };
 
   return (
     <nav className="navbar">
@@ -19,7 +37,9 @@ function NavBar() {
         <Link className={isActive('/rooms')} to="/rooms">Book a Room</Link>
         <Link className={isActive('/room-service')} to="/room-service">Room Service</Link>
         <Link className={isActive('/maintenance')} to="/maintenance">Report Issue</Link>
-        <Link className={isActive('/login')} to="/login">Sign In</Link>
+        {loggedIn
+          ? <a className="nav-link" href="#" onClick={signOut}>Sign Out</a>
+          : <Link className={isActive('/login')} to="/login">Sign In</Link>}
       </div>
     </nav>
   );

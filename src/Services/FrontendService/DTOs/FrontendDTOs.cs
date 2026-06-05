@@ -18,6 +18,11 @@ public class CreateGuestDTO
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
     
+    // Plain-text password from the form; hashed before storage.
+    [Required]
+    [StringLength(100, MinimumLength = 6)]
+    public string Password { get; set; } = string.Empty;
+    
     [Phone]
     public string? PhoneNumber { get; set; }
     
