@@ -1,3 +1,4 @@
+using HotelOS.Shared.Events;
 using HotelOS.Shared.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -112,12 +113,4 @@ public class CleaningResponse
     public CleaningTaskDTO? Task { get; set; }
     public Room? Room { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-}
-
-public enum CleaningPriority
-{
-    Low = 1,
-    Normal = 2,
-    High = 3,
-    Urgent = 4
 }

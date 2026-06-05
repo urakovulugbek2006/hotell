@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHotelOSInfrastructure(builder.Configuration);
 
 // Add Maintenance Service dependencies
-builder.Services.AddScoped<IMaintenanceService, MaintenanceService.Services.MaintenanceService>();
+builder.Services.AddScoped<IMaintenanceService, global::MaintenanceService.Services.MaintenanceService>();
 builder.Services.AddSingleton<IPriorityQueueService, PriorityQueueService>();
 
 // Add Background Services
@@ -54,7 +54,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();

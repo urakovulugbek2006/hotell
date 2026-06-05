@@ -1,5 +1,6 @@
 using HotelOS.Shared.Models;
 using System.ComponentModel.DataAnnotations;
+using global::DashboardService.Services; // for DashboardUpdateType enum
 
 namespace DashboardService.DTOs;
 

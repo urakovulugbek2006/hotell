@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHotelOSInfrastructure(builder.Configuration);
 
 // Add Reception Service dependencies
-builder.Services.AddScoped<IReceptionService, ReceptionService.Services.ReceptionService>();
+builder.Services.AddScoped<IReceptionService, global::ReceptionService.Services.ReceptionService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
 builder.Services.AddScoped<IRoomAssignmentAlgorithm, RoomAssignmentAlgorithm>();
 
@@ -52,7 +52,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();

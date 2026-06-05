@@ -19,7 +19,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHotelOSInfrastructure(builder.Configuration);
 
 // Add Room Service dependencies
-builder.Services.AddScoped<IRoomService, RoomService.Services.RoomService>();
+builder.Services.AddScoped<IRoomService, global::RoomService.Services.RoomService>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -50,7 +50,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();

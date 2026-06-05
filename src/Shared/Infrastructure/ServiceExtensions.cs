@@ -24,11 +24,6 @@ public static class ServiceExtensions
         // Add Message Broker
         services.AddSingleton<IMessageBroker, RedisMessageBroker>();
 
-        // Add Health Checks
-        services.AddHealthChecks()
-            .AddDbContextCheck<HotelDbContext>()
-            .AddRedis(configuration.GetConnectionString("Redis") ?? "localhost:6379");
-
         return services;
     }
 
